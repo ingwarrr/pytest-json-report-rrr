@@ -238,7 +238,7 @@ class JSONReport(JSONReportBase):
             if self._json_warnings:
                 json_report['warnings'] = self._json_warnings
 
-        self._config.hook.pytest_json_modifyreport(json_report=json_report)
+        self._config.hook.pytest_json_modifyreport(json_report=json_report, session=session)
         # After the session has finished, other scripts may want to use report
         # object directly
         self.report = json_report
@@ -277,6 +277,7 @@ class JSONReport(JSONReportBase):
                 f,
                 default=str,
                 indent=self._config.option.json_report_indent,
+                ensure_ascii=False
             )
 
     def pytest_warning_recorded(self, warning_message, when):
@@ -325,7 +326,7 @@ class LoggingHandler(logging.Handler):
 
 class Hooks:
 
-    def pytest_json_modifyreport(self, json_report):
+    def pytest_json_modifyreport(self, json_report, session):
         """Called after building JSON report and before saving it.
 
         Plugins can use this hook to modify the report before it's saved.
