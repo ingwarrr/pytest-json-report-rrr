@@ -242,7 +242,13 @@ class JSONReport(JSONReportBase):
         # After the session has finished, other scripts may want to use report
         # object directly
         self.report = json_report
+
         path = self._config.option.json_report_file
+        run_id = self._config.option.run_id
+        default_path = self._config.option.json_report_default_path
+        if path == ".report.json" and run_id and default_path is not None:
+            path = f"{default_path}.report-{run_id}.json"
+
         if path:
             try:
                 self.save_report(path)
@@ -389,6 +395,11 @@ def pytest_addoption(parser):
     group._addoption(
         '--json-report-verbosity', type=int, help='set verbosity (default is '
         'value of --verbosity)')
+    group._addoption(
+        '--json-report-default-path',
+        default='/opt/test_results/reports/',
+        type=lambda x: None if x.lower() == 'none' else x,
+        help='sets default path for reports')
 
 
 def pytest_configure(config):
